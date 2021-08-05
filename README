@@ -1,0 +1,91 @@
+Lăbău Cristea Andrei Liviu 324CB
+
+    Pentru a implementa programul client ce interactioneaza cu serverul am
+    folosit o parte din scheletul laboratorului 10 si ca idee de rezolvare a
+    temei m-am ghidat tot dupa indicatiile din acest laborator.
+    Spre deosebire de laborator unde nu a trebuit implementata o consola
+    interactiva si unde conexiunea la server se realiza o singura data, aici
+    conexiunea la server se inchide dupa executarea unei comenzi si se redeschide
+    la primerea unei comenzi noi.
+
+    In fisierul client.cpp este implementata functia parser() care are rolul
+    de a tine deschisa consola interactiva in cadrul careia utilizatorul poate
+    da comenzi programului client.
+
+    M-am folosit de un datatype enum string_code pentru a codifica toate
+    comenzile pe care utilizatorul le poate da si de functia hashString pentru
+    a mapa comanda la enumul corespunzator pentru a le folosi in cadrul unei
+    constructii tip switch case in scopul imbunatatirii claritatii codului.
+    Pentru implementarea propriu-zisa a comenzilor am urmat aceeasi procedura
+    la toate, cu mici modificari acolo unde a fost cazul:
+        1) am facut o functie al carui rol este sa construiasca mesajul de 
+        GET/POST/DELETE request ce urmeaza a fi trimis serverului.
+        2) am facut o functie care este apelata in parser si trimite mesajul
+        construit anterior catre server si receptioneaza raspunsul primit 
+        (succes sau eroare), salveaza eventuale informatii importante din acest
+        raspuns (cookies, tokens) in variabile trimise prin referinta functiei 
+        si apeleaza o functie care:
+        3) parseaza raspunsul si afiseaza la stdout un mesaj corespunzator, in
+        functie de situatie. La aceste functii am verificat prima linie din
+        mesajul de raspuns si in cazul in care gaseam codul de succes, afisam
+        mesajul corespunzator cazului de succes, in caz contrar verificam ultima
+        linie si in cazul in care gaseam structura unui mesaj de eroare 
+        "error:..." afisam eroarea.
+
+    Datorita functiilor foarte user friendly puse la dispozitie de catre
+    biblioteca nlohmann am ales sa o folosesc pe aceasta pentru a parsa in
+    obiecte json stringurile ce contineau informatii despre cartile din server,
+    cu scopul de a le afisa intr-un mod lizibil. De asemenea, m-am folosit de
+    obiectele de tip json pentru a incapsula informatii ce trebuiau trimise
+    serverului, de exemplu numele de utilizator si parola in cazul comenzilor
+    register si login.
+
+    Toate functiile auxiliare folosite pentru implementarea comenzilor din enunt
+    se afla in fisierul helpers.cpp.
+
+    Comenzile au fost implementate in felul urmator:
+    1) register: se formeaza un mesaj de POST request cu structura specificata
+    in enunt si se trimit ca date usernamenul si parola sub forma unui obiect
+    json. Mesajul este trimis la server si se afiseaza un mesaj de succes,
+    eroare sau timeout.
+    2) login: se formeaza un mesaj de POST request similar cu cel din cazul
+    register si se trimite la server. La formarea mesajului se pastreaza intr-un
+    obiect json informatiile contului de utilizator curent logat la server
+    pentru a forma mesajul de intampinare utilizator.
+    In caz de succes, se salveaza cookieul de sesiune intors de server care va
+    fi folosit ulterior pentru a demonstra ca utilizatorul este autentificat.
+    De mentionat faptul ca in implementarea mea, daca un utilizator este deja
+    logat, comanda login va intoarce un mesaj de eroare. Pentru a se putea loga
+    alt utilizator, trebuie sa se dea mai intai comanda de logout.
+    3) enter_libary: se formeaza un mesaj de GET request, adaugandu-se cookieul
+    primit in urma comenzii de login. Se trimite la server.
+    In caz de succes, se salveaza tokenul jwt pentru ca utilizatorul sa poate
+    demonstra accesul la biblioteca pentru viitoare operatiuni.
+    4) get_books: se formeaza un mesaj de GET request, adaugand tokenul de la
+    comanda de enter_library si se trimite la server. In caz de succes se parseaza
+    lista cu informatiile cartilor primite de la server, fiecare carte in cate 
+    un obiect json si se afiseaza.
+    5) get_book: se formeaza un mesaj de GET request, adaungand tokenul de acces
+    si id-ul cartii pentru care se doreste afisarea informatiilor. Se trimite la
+    server, iar in caz de succes se parseaza din raspunsul primit, informatiile
+    referitoare la carte intr-un obiect json, la care se adauga id-ul cartii 
+    deoarece acesta nu este intors automat de server si se afiseaza.
+    De mentionat faptul ca afisarea cheilor din obiectul json se realizeaza in
+    ordine alfabetica datorita modului in care este implementata afisarea pentru
+    obiecte json in bibliota nlohmann.
+    6) add_book: se formeaza un mesaj de POST request, adaugand tokenul de acces
+    si ca date, se adauga un obiect json ce contine informatiile cartii ce se
+    doreste a fi adaugate in biblioteca. Se trimite la server si in caz de succes
+    se afiseaza un mesaj care informeaza utilizatorul referitor la faptul ca
+    a fost adaugata cartea.
+    7) delete_book: se formeaza un mesaj de DELETE request, adaugand tokenul de
+    acces si se pastreaza titlul cartii sterse cu scopul formarii mesajului ce 
+    va fi afisat in caz de succes.
+    8) logout: se formeaza un mesaj de GET request, adaugan cookieul de sesiune
+    pentru a demonsta in primul rand ca utilizatorul este logat. La logout, se
+    sterg cookieul de sesiune si tokenul jwt, astfel incat operatiunile ce le
+    necesita sa nu mai poata fi posibile pana ce un alt utilizator se logheaza
+    si obtine accesul la biblioteca.
+    9) exit: se verifica daca un utilizator este logat (verificand daca exista
+    un cookie de sesiune). Daca exista un utilizator logat, il delogheaza si
+    se iese din program. Daca nu, se iese din program direct.
