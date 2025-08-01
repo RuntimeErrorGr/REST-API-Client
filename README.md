@@ -1,5 +1,15 @@
 ## Client Application Implementation
 
+This project is a C++ implementation of a web client that interacts with a RESTful API using HTTP methods such as `GET`, `POST`, and `DELETE`. It simulates a command-line client capable of registering users, logging in, managing sessions with cookies and JWT tokens, and performing CRUD operations on a book database provided by the server.
+
+The client features:
+- Persistent interactive CLI for user input and command parsing
+- HTTP request construction and socket communication with the server
+- Session management via cookies (for login/logout)
+- Authorization with JWT tokens for protected endpoints
+- JSON request/response handling using the [`nlohmann/json`](https://github.com/nlohmann/json) library
+- Clear separation of concerns via modular helper functions
+
 To implement the client program that interacts with the server, I used part of the skeleton from Lab 10. I also followed the conceptual structure provided in the lab for solving the assignment.
 
 Unlike the lab, where an interactive console was not required and the connection to the server was established only once, here the connection is closed after each command is executed and reopened upon receiving a new command.
