@@ -1,6 +1,6 @@
 ## Client Application Implementation
 
-This project is a C++ implementation of a web client that interacts with a RESTful API using HTTP methods such as `GET`, `POST`, and `DELETE`. It simulates a command-line client capable of registering users, logging in, managing sessions with cookies and JWT tokens, and performing CRUD operations on a book database provided by the server.
+This project is a C++ implementation of a web client that interacts with a RESTful API using HTTP methods such as `GET`, `POST`, and `DELETE`. It simulates a command-line client capable of registering users, logging in, managing sessions with cookies and JWT tokens and performing CRUD operations on a book database provided by the server.
 
 The client features:
 - Persistent interactive CLI for user input and command parsing
